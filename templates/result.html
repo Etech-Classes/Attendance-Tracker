@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Attendance - Result</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script>
+    window.onload = function() {
+      // show popup alert with filename
+      alert("Absentees file is ready: {{ out_filename }}");
+    }
+  </script>
+</head>
+<body>
+  <div class="card">
+    <h1>Absentees Generated</h1>
+    <p><strong>Subject:</strong> {{ subject }} &nbsp; | &nbsp; <strong>Date:</strong> {{ date }}</p>
+    <p><strong>Absentees found:</strong> {{ absentees_count }}</p>
+
+    {% if not_found %}
+      <div class="warn">
+        <strong>Present names not found in master list (they were not matched):</strong>
+        <ul>
+          {% for n in not_found %}
+            <li>{{ n }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <h3>Preview (first 50 rows)</h3>
+    <table>
+      <thead>
+        <tr>
+          {% for k in (absentees_preview[0].keys() if absentees_preview else ['StudentName']) %}
+            <th>{{ k }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in absentees_preview %}
+          <tr>
+            {% for val in row.values() %}
+              <td>{{ val }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p>
+      <a href="{{ url_for('download', filename=out_filename) }}" class="btn">Download Absentees CSV</a>
+      &nbsp; <a href="{{ url_for('index') }}" class="btn secondary">Start Over</a>
+    </p>
+  </div>
+</body>
+</html>

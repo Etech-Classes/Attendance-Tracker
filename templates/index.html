@@ -1,95 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Attendance Tracker</title>
-    <style>
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f2f2f2;
-        margin: 0;
-        padding: 0;
-    }
-
-    h1 {
-        text-align: center;
-        color: #333;
-        padding: 20px 0;
-        background-color: #4CAF50;
-        color: white;
-        margin: 0;
-    }
-
-    form {
-        max-width: 500px;
-        margin: 40px auto;
-        padding: 30px;
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    label {
-        display: block;
-        margin-bottom: 8px;
-        color: #555;
-    }
-
-    input[type="file"] {
-        width: 100%;
-        margin-bottom: 20px;
-    }
-
-    input[type="submit"] {
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        font-size: 16px;
-        border-radius: 4px;
-        cursor: pointer;
-        width: 100%;
-    }
-
-    input[type="submit"]:hover {
-        background-color: #45a049;
-    }
-
-    h2 {
-        text-align: center;
-        color: #4CAF50;
-    }
-
-    a {
-        display: block;
-        text-align: center;
-        margin-top: 10px;
-        color: #0066cc;
-        text-decoration: none;
-        font-weight: bold;
-    }
-
-    a:hover {
-        text-decoration: underline;
-    }
-</style>
+  <meta charset="utf-8">
+  <title>Attendance - Step 1</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Attendance Tracker</h1>
+  <div class="card">
+    <h1>Attendance - Step 1</h1>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+    <form method="post" action="{{ url_for('index') }}">
+      <label>Subject</label>
+      <input type="text" name="subject" placeholder="e.g., Math" required>
 
-    <form action="/process" method="POST" enctype="multipart/form-data">
-        <label><strong>Total Students List (CSV):</strong></label><br>
-        <input type="file" name="total_file" accept=".csv" required><br><br>
+      <label>Date (YYYY-MM-DD)</label>
+      <input type="date" name="date" required>
 
-        <label><strong>Present Students List (CSV):</strong></label><br>
-        <input type="file" name="present_file" accept=".csv" required><br><br>
+      <label>Total students (count)</label>
+      <input type="number" name="total_count" min="1" required>
 
-        <input type="submit" value="Generate Absentees">
+      <label>Present students (count)</label>
+      <input type="number" name="present_count" min="0" required>
+
+      <button type="submit">Next — Upload Files</button>
     </form>
-
-    {% if absentees %}
-        <h2>✔ Absentees Identified</h2>
-        <a href="/download">Download Absentees CSV</a>
-    {% endif %}
+  </div>
 </body>
 </html>
