@@ -2,12 +2,11 @@ import os
 from flask import Flask, render_template, request, send_file, flash, redirect, url_for
 import pandas as pd
 from werkzeug.utils import secure_filename
-import tempfile
+from fuzzywuzzy import fuzz, process
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "change-this-for-prod")
 
-# Use a writable ephemeral directory (Render's filesystem is ephemeral)
 UPLOAD_FOLDER = "/tmp/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 ALLOWED_EXTENSIONS = {"csv"}
@@ -42,7 +41,6 @@ def process():
     total_file.save(total_path)
     present_file.save(present_path)
 
-    # Load CSVs safely
     try:
         total_df = pd.read_csv(total_path)
         present_df = pd.read_csv(present_path)
@@ -50,21 +48,33 @@ def process():
         flash(f"Error reading CSV: {e}")
         return redirect(url_for("index"))
 
-    # Ensure required column exists
     if "StudentName" not in total_df.columns:
-        flash("Total students CSV must contain column 'StudentName' (and optional 'Batch').")
+        flash("Total students CSV must contain column 'StudentName'.")
         return redirect(url_for("index"))
     if "StudentName" not in present_df.columns:
         flash("Present students CSV must contain column 'StudentName'.")
         return redirect(url_for("index"))
 
-    # Normalize and compute absentees
+    # Normalize
     total_df["StudentName"] = total_df["StudentName"].astype(str).str.strip().str.lower()
     present_df["StudentName"] = present_df["StudentName"].astype(str).str.strip().str.lower()
 
-    absentees_df = total_df[~total_df["StudentName"].isin(present_df["StudentName"])]
+    present_list = present_df["StudentName"].tolist()
+    absent_data = []
 
-    # Save to temp file
+    for name in total_df["StudentName"]:
+        if name in present_list:
+            status = "True"  # exact match
+        else:
+            match, score = process.extractOne(name, present_list, scorer=fuzz.token_sort_ratio)
+            if score >= 80:  # threshold for partial match
+                status = "Mismatch"
+            else:
+                status = "Not Found"
+        if status != "True":
+            absent_data.append({"StudentName": name, "MatchStatus": status})
+
+    absentees_df = pd.DataFrame(absent_data)
     out_path = os.path.join(UPLOAD_FOLDER, "absentees.csv")
     absentees_df.to_csv(out_path, index=False)
 
