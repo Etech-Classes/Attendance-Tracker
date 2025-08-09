@@ -2,32 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Attendance - Step 1</title>
+  <title>Attendance — Step 1</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="card">
-    <h1>Attendance - Step 1</h1>
+    <h1>Attendance Tracker — Step 1</h1>
+
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <div class="flash">{{ messages[0] }}</div>
       {% endif %}
     {% endwith %}
-    <form method="post" action="{{ url_for('index') }}">
-      <label>Subject</label>
-      <input type="text" name="subject" placeholder="e.g., Math" required>
 
-      <label>Date (YYYY-MM-DD)</label>
+    <form method="post" action="{{ url_for('step1') }}">
+      <label>Subject</label>
+      <input type="text" name="subject" placeholder="e.g., Mathematics" required>
+
+      <label>Exam date</label>
       <input type="date" name="date" required>
 
-      <label>Total students (count)</label>
-      <input type="number" name="total_count" min="1" required>
-
-      <label>Present students (count)</label>
-      <input type="number" name="present_count" min="0" required>
-
-      <button type="submit">Next — Upload Files</button>
+      <button type="submit">Proceed to Upload</button>
     </form>
+
+    <p class="muted">Step 1 collects exam info (used in filename). Step 2 will ask you to upload CSV files.</p>
   </div>
 </body>
 </html>

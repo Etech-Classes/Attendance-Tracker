@@ -2,14 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Attendance - Upload</title>
+  <title>Attendance — Upload</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="card">
-    <h1>Upload CSVs</h1>
-    <p><strong>Subject:</strong> {{ subject }} &nbsp; | &nbsp; <strong>Date:</strong> {{ date }}</p>
-    <p><strong>Expected counts</strong> — Total: {{ total }} , Present: {{ present }}</p>
+    <h1>Upload student CSVs</h1>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -17,19 +15,21 @@
       {% endif %}
     {% endwith %}
 
-    <form method="post" enctype="multipart/form-data">
-      <label>Total Students CSV</label>
-      <input type="file" name="total_file" accept=".csv" required>
-      <small>CSV must have column <code>StudentName</code> (or first column will be used)</small>
+    <p><strong>Subject:</strong> {{ subject }} &nbsp; | &nbsp; <strong>Date:</strong> {{ date_display }}</p>
+    <p class="muted">CSV rules: master (total) list should have a "StudentName" column (or first column will be used). Present list similarly should have names.</p>
 
-      <label>Present Students CSV</label>
+    <form method="post" enctype="multipart/form-data">
+      <label>Total students CSV</label>
+      <input type="file" name="total_file" accept=".csv" required>
+
+      <label>Present students CSV</label>
       <input type="file" name="present_file" accept=".csv" required>
-      <small>CSV must have column <code>StudentName</code> (or first column will be used)</small>
 
       <button type="submit">Process Attendance</button>
     </form>
 
-    <p class="hint">You can go back to <a href="{{ url_for('index') }}">Step 1</a> to change subject/date.</p>
+    <p class="hint">Tip: if names include accents or punctuation, the app will normalize and attempt accurate matches.</p>
+    <p><a href="{{ url_for('step1') }}" class="btn secondary">Change subject/date</a></p>
   </div>
 </body>
 </html>

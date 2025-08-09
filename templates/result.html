@@ -2,56 +2,70 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Attendance - Result</title>
+  <title>Attendance — Result</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script>
     window.onload = function() {
-      // show popup alert with filename
+      // popup includes file name
       alert("Absentees file is ready: {{ out_filename }}");
-    }
+    };
   </script>
 </head>
 <body>
   <div class="card">
-    <h1>Absentees Generated</h1>
-    <p><strong>Subject:</strong> {{ subject }} &nbsp; | &nbsp; <strong>Date:</strong> {{ date }}</p>
-    <p><strong>Absentees found:</strong> {{ absentees_count }}</p>
+    <h1>Absentees — Result</h1>
 
-    {% if not_found %}
+    <p><strong>Subject:</strong> {{ subject }} &nbsp; | &nbsp; <strong>Date:</strong> {{ date_display }}</p>
+
+    <p>
+      <strong>Total (master list):</strong> {{ total_count }} &nbsp; |
+      <strong>Present (records provided):</strong> {{ present_records }} &nbsp; |
+      <strong>Matched present:</strong> {{ matched_count }} &nbsp; |
+      <strong>Absentees:</strong> {{ absentees_count }}
+    </p>
+
+    {% if not_found_present %}
       <div class="warn">
-        <strong>Present names not found in master list (they were not matched):</strong>
+        <strong>Present names not found in master list (these were not matched):</strong>
         <ul>
-          {% for n in not_found %}
+          {% for n in not_found_present %}
             <li>{{ n }}</li>
           {% endfor %}
         </ul>
       </div>
     {% endif %}
 
-    <h3>Preview (first 50 rows)</h3>
-    <table>
-      <thead>
-        <tr>
-          {% for k in (absentees_preview[0].keys() if absentees_preview else ['StudentName']) %}
-            <th>{{ k }}</th>
-          {% endfor %}
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in absentees_preview %}
+    <h3>Absentees preview (first rows)</h3>
+    {% if absentees_preview %}
+      <table>
+        <thead>
           <tr>
-            {% for val in row.values() %}
-              <td>{{ val }}</td>
+            {% for k in absentees_preview[0].keys() %}
+              <th>{{ k }}</th>
             {% endfor %}
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {% for row in absentees_preview %}
+            <tr>
+              {% for val in row.values() %}
+                <td>{{ val }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No absentees found — great!</p>
+    {% endif %}
 
-    <p>
-      <a href="{{ url_for('download', filename=out_filename) }}" class="btn">Download Absentees CSV</a>
-      &nbsp; <a href="{{ url_for('index') }}" class="btn secondary">Start Over</a>
+    <p style="margin-top:16px;">
+      <a class="btn" href="{{ url_for('download', filename=out_filename) }}">Download absentees CSV</a>
+      &nbsp;
+      <a class="btn secondary" href="{{ url_for('step1') }}">Start new</a>
     </p>
+
+    <p class="muted">Output filename: <code>{{ out_filename }}</code></p>
   </div>
 </body>
 </html>
